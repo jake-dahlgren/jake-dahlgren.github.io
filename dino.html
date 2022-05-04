@@ -2125,7 +2125,7 @@ function Runner(outerContainerId, opt_config) {
   this.distanceRan = 0;
 
   this.highestScore = 0;
-  this.syncHighestScore = false;
+  this.syncHighestScore = true;
 
   this.time = 0;
   this.runningTime = 0;
@@ -2135,7 +2135,7 @@ function Runner(outerContainerId, opt_config) {
 
   this.obstacles = [];
 
-  this.activated = false; // Whether the easter egg has been activated.
+  this.activated = true; // Whether the easter egg has been activated.
   this.playing = false; // Whether the game is currently in play state.
   this.crashed = false;
   this.paused = false;
@@ -2232,18 +2232,18 @@ Runner.config = {
   // Scroll Y threshold at which the game can be activated.
   CANVAS_IN_VIEW_OFFSET: -10,
   CLEAR_TIME: 3000,
-  CLOUD_FREQUENCY: 0.5,
+  CLOUD_FREQUENCY: 10.5, //was .5
   FADE_DURATION: 1,
   FLASH_DURATION: 1000,
   GAMEOVER_CLEAR_TIME: 1200,
   INITIAL_JUMP_VELOCITY: 12,
   INVERT_FADE_DURATION: 12000,
   MAX_BLINK_COUNT: 3,
-  MAX_CLOUDS: 6,
+  MAX_CLOUDS: 600, //was 6
   MAX_OBSTACLE_LENGTH: 3,
   MAX_OBSTACLE_DUPLICATION: 2,
   RESOURCE_TEMPLATE_ID: 'audio-resources',
-  SPEED: 6,
+  SPEED: 9, // was 6
   SPEED_DROP_COEFFICIENT: 3,
   ARCADE_MODE_INITIAL_TOP_POSITION: 35,
   ARCADE_MODE_TOP_POSITION_PERCENT: 0.1
