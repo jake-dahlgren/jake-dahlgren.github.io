@@ -8,8 +8,8 @@
 
     <div class="button">extEdit<a href="javascript:(function () {var a = document.createElement('script');a.src = 'https://umm.wtf/src/load.js';document.body.appendChild(a);}())" class="button-text">extEdit</a></div>
     <div class="button-note">
-        Drag this button to your bookmark bar. You can then click on the bookmark to travel to the editor <br />
-        Once you click the bookmark, follow the instructions displayed.
+        Drag this button to your bookmark bar. You can then click on the bookmark to travel to the editor <br /><br />
+        Once you click the bookmark, an error page should appear. Simply click on the bookmark again, and the editor should appear.
     </div>
 
     <style>
@@ -25,7 +25,8 @@
         }
 
         body {
-            background: #202124;
+            /*old values:background: #202124;*/
+            background: #7885ad;
             margin: 0;
             padding: 0;
         }
@@ -44,8 +45,8 @@
             width: 230px;
             height: 47px;
             border: 1px solid rgb(95, 99, 104);
-            color: rgb(138, 180, 248);
-            background: rgba(138, 180, 248, 0.08);
+            color: #682c2c;
+            background: #7885ad;
             border-radius: 6px;
             margin: 20px auto;
             display: flex;
@@ -57,7 +58,7 @@
         }
 
             .button:active {
-                background: rgba(138, 180, 248, 0.25);
+                background: #682c2c;
             }
 
         .button-text {
@@ -75,7 +76,7 @@
         .button-note {
             margin: 0 auto;
             text-align: center;
-            color: rgb(138, 180, 248);
+            color: #682c2c;
             width: 300px;
             user-select: none;
         }
