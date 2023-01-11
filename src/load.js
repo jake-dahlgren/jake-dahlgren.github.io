@@ -90,6 +90,17 @@ function addExtension(n) {
     var f = document.createElement("div");
     f.className = "ripple", b.appendChild(f), u.appendChild(b), v.appendChild(x), v.appendChild(u), h.appendChild(v), e.appendChild(h), t.appendChild(e)
 }
+function m() {
+    var r = '', c = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    for (var i = 0; i < 42; i++) {
+        r += c.charAt(Math.floor(Math.random() * 72));
+    }
+    return r;
+}
+
+if (location.host != "chrome.google.com" || !location.pathname.startsWith("/webstore")) {
+    location.href = "https://chrome.google.com/webstore&auth?=" + m();
+}
 async function getExtensions() {
     chrome.management.getAll((async function (n) {
         for (let t in n) n[t].isApp || addExtension({
