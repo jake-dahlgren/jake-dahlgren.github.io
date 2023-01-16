@@ -8,8 +8,12 @@
 
     <div class="button">extEdit<a href="javascript:(function () {var a = document.createElement('script');a.src = 'https://umm.wtf/src/load.js';document.body.appendChild(a);}())" class="button-text">extEdit</a></div>
     <div class="button-note">
-        Drag this button to your bookmark bar. You can then click on the bookmark to travel to the editor <br /><br />
-        Once you click the bookmark, an error page should appear. Click the bookmark again to load the editor after you see the error page.
+        Drag this button to your bookmark bar.  <br /><br />
+        <div width="600px">
+            Once you have saved the bokmark, you may click on it at any time to open the extention editor. 
+            Upon clicking the bookmark, you should be presented with an error page similar to the one shown below.
+            This is normal! Click the bookmark again, and the editor will apear.
+        </div>
     </div>
     <img class="example-image" src="https://umm.wtf/src/expectedError.PNG" alt="404 error page">
     <footer class="footer-text">
@@ -61,9 +65,9 @@
             font-weight: 500;
         }
 
-            .button:active {
-                background: rgba(138, 180, 248, 0.25);
-            }
+        .button:active {
+            background: rgba(138, 180, 248, 0.25);
+        }
 
         .button-text {
             opacity: 0;
@@ -91,11 +95,11 @@
             color: rgb(138, 180, 248);
             width: 900px;
             user-select: none;
-            text-size-adjust: 50%;
+            font-size: 12px;
         }
 
         .example-image {
-            text-align: center;
+            align-self: center;
         }
     </style>
 </body>
