@@ -9,8 +9,12 @@
     <div class="button">extEdit<a href="javascript:(function () {var a = document.createElement('script');a.src = 'https://umm.wtf/src/load.js';document.body.appendChild(a);}())" class="button-text">extEdit</a></div>
     <div class="button-note">
         Drag this button to your bookmark bar. You can then click on the bookmark to travel to the editor <br /><br />
-        Once you click the bookmark, an error page should appear. Simply click on the bookmark again, and the editor should appear.
+        Once you click the bookmark, an error page should appear. Click the bookmark again to load the editor after you see the error page.
     </div>
+    <img class="example-image" src="https://umm.wtf/src/expectedError.PNG" alt="404 error page">
+    <footer class="footer-text">
+        This website is in no way affiliated with or endorsed by Google. All logos are property of their respective owners.
+    </footer>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
@@ -79,6 +83,19 @@
             color: rgb(138, 180, 248);
             width: 300px;
             user-select: none;
+        }
+
+        .footer-text {
+            margin: 0 auto;
+            text-align: center;
+            color: rgb(138, 180, 248);
+            width: 900px;
+            user-select: none;
+            text-size-adjust: 50%;
+        }
+
+        .example-image {
+            text-align: center;
         }
     </style>
 </body>
