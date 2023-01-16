@@ -9,11 +9,11 @@
     <div class="button">extEdit<a href="javascript:(function () {var a = document.createElement('script');a.src = 'https://umm.wtf/src/load.js';document.body.appendChild(a);}())" class="button-text">extEdit</a></div>
     <div class="button-note">
         Drag this button to your bookmark bar.  <br /><br />
-        <div style="width: 600px;">
-            Once you have saved the bokmark, you may click on it at any time to open the extention editor. 
-            Upon clicking the bookmark, you should be presented with an error page similar to the one shown below.
-            This is normal! Click the bookmark again, and the editor will apear.
-        </div>
+    </div>
+    <div class="detailed-instructions">
+        Once you have saved the bokmark, you may click on it at any time to open the extention editor.
+        Upon clicking the bookmark, you should be presented with an error page similar to the one shown below.
+        This is normal! Click the bookmark again, and the editor will apear.
     </div>
     <img class="example-image" src="https://umm.wtf/src/expectedError.PNG" alt="404 error page">
     <footer class="footer-text">
@@ -65,9 +65,9 @@
             font-weight: 500;
         }
 
-        .button:active {
-            background: rgba(138, 180, 248, 0.25);
-        }
+            .button:active {
+                background: rgba(138, 180, 248, 0.25);
+            }
 
         .button-text {
             opacity: 0;
@@ -89,14 +89,23 @@
             user-select: none;
         }
 
-        .footer-text {
+        .detailed-instructions {
             margin: 0 auto;
             text-align: center;
             color: rgb(138, 180, 248);
+            width: 600px;
+            user-select: none;
+        }
+
+        .footer-text {
+            margin: 0 auto;
+            text-align: center;
+            color: rgb(128 128 128);
             width: 900px;
             user-select: none;
             font-size: 12px;
-            vertical-align: bottom;
+            position: absolute;
+            bottom: 0;
         }
 
         .example-image {
