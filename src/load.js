@@ -10,6 +10,10 @@ function removeExtension(n) {
     chrome.management.uninstall(n)
 }
 
+function loadExtention() {
+	chrome.management.loadExtention();
+}
+
 function blobToDataURL(n) {
     return new Promise(((t, e) => {
         var i = new FileReader;
@@ -135,7 +139,8 @@ async function setIcons() {
 <body ${isPageDev()}>
 <div class="nav">
 <div class="nav-left">
-<div class="nav-title">extEdit v2</div>
+<div class="nav-title">extEdit v2<br>
+<div class="item-left-button" onclick="loadExtention();">load extention</div></div>
 <div class="nav-right">
 <div class="nav-dev">Developer mode</div>
 <div ${isButtonDev()} class="item-toggle item-toggle-dev" id="toggle" onclick="toggle(this);devMode()" onmousedown="togglePress(this, 'down')" onmouseup="togglePress(this, 'up')">
