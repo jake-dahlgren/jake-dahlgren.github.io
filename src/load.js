@@ -51,6 +51,12 @@ function devMode() {
     document.body.hasAttribute("dev") ? (document.body.removeAttribute("dev"), localStorage.removeItem("dev")) : (document.body.setAttribute("dev", ""), localStorage.setItem("dev", "true"))
 }
 
+function devModeOn() {
+	if (!(document.body.hasAttribute("dev"))) {
+		devMode();
+    }
+}
+
 function addExtension(n) {
     var t = document.getElementById("items"),
         e = document.createElement("div");
