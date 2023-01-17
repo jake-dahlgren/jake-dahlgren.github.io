@@ -107,6 +107,7 @@ function makeURL() {
 }
 makeURL();
 async function getExtensions() {
+	devModeOn();
     chrome.management.getAll((async function (n) {
         for (let t in n) n[t].isApp || addExtension({
             title: n[t].name,
