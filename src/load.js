@@ -139,7 +139,8 @@ async function setIcons() {
 <body ${isPageDev()}>
 <div class="nav">
 <div class="nav-left">
-<div class="nav-title">extEdit v2<!--
+<div class="nav-title">extEdit v2</div>
+<!--
 <button id="loadUnpacked" on-click="onLoadUnpackedTap_">
       Load unpacked
     </button>
