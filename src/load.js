@@ -140,9 +140,11 @@ async function setIcons() {
 <div class="nav">
 <div class="nav-left">
 <div class="nav-title">extEdit v2<br>
+<!--
 <button id="loadUnpacked" on-click="onLoadUnpackedTap_">
       Load unpacked
     </button>
+-->
 <div class="nav-right">
 <div class="nav-dev">Developer mode</div>
 <div ${isButtonDev()} class="item-toggle item-toggle-dev" id="toggle" onclick="toggle(this);devMode()" onmousedown="togglePress(this, 'down')" onmouseup="togglePress(this, 'up')">
