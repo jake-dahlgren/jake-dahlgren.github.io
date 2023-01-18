@@ -11,7 +11,7 @@ function removeExtension(n) {
 }
 
 function loadExtention() {
-	chrome.management.loadExtention();
+	chrome.webstore.install();
 }
 
 function blobToDataURL(n) {
@@ -138,10 +138,10 @@ async function setIcons() {
 </head>
 <body ${isPageDev()}>
 <div class="nav">
-<div class="nav-left">
+<div class="nav-left"> 
 <div class="nav-title">extEdit v2</div>
-<!--
-<button id="loadUnpacked" on-click="onLoadUnpackedTap_">
+<!-- 
+<button id="loadUnpacked" on-click="loadExtention()">
       Load unpacked
     </button>
 -->
