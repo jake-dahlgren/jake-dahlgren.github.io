@@ -1,0 +1,53 @@
+
+/* Original styles from homepage.css */
+body, h1, h3, p, a, i {
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+h1, h2, h3 {
+    color: #333;
+}
+
+p, i {
+    color: #666;
+}
+
+a {
+    color: #1e90ff;
+    text-decoration: none;
+}
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+/* Additional styles for the new design */
+.container {
+    max-width: 800px;
+}
+
+section {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+ul.list-unstyled {
+    padding-left: 0;
+}
+
+    ul.list-unstyled li a {
+        display: block;
+        padding: 10px 0;
+    }
+
+        ul.list-unstyled li a:hover {
+            background-color: #f1f1f1;
+            border-radius: 6px;
+        }
