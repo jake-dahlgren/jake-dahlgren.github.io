@@ -1,0 +1,420 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resistor Combination Finder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg w-full max-w-3xl">
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">Resistor Combination Finder</h1>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-end gap-4 mb-6">
+            <div class="w-full">
+                <label for="targetValue" class="block text-sm font-medium text-gray-700 mb-1">Desired Resistance:</label>
+                <input type="number" id="targetValue" name="targetValue" step="any" placeholder="e.g., 4700" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="w-full">
+                <label for="targetUnit" class="block text-sm font-medium text-gray-700 mb-1">Unit:</label>
+                <select id="targetUnit" name="targetUnit" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 h-[42px]">
+                    <option value="1" selected>Ω (Ohms)</option>
+                    <option value="1000">kΩ (kiloOhms)</option>
+                    <option value="1000000">MΩ (megaOhms)</option>
+                </select>
+            </div>
+            <div class="w-full">
+                <label for="maxResistors" class="block text-sm font-medium text-gray-700 mb-1">Max Resistors:</label>
+                <select id="maxResistors" name="maxResistors" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 h-[42px]">
+                    <option value="2">Up to 2</option>
+                    <option value="3">Up to 3</option>
+                    <option value="4" selected>Up to 4</option>
+                </select>
+            </div>
+            <button id="generateButton" class="w-full px-6 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out h-[42px]">
+                Generate
+            </button>
+        </div>
+
+        <div class="mb-6 border border-gray-200 p-4 rounded-md">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Available Resistor Values (Ohms)</label>
+            <div class="flex flex-col sm:flex-row items-end gap-2 mb-2">
+                <div class="flex-grow">
+                    <label for="seriesSelect" class="block text-xs font-medium text-gray-600 mb-1">Select Standard Series:</label>
+                    <select id="seriesSelect" name="seriesSelect" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 h-[42px]">
+                        <option value="E6">E6 (20%)</option>
+                        <option value="E12">E12 (10%)</option>
+                        <option value="E24" selected>E24 (5%)</option>
+                        <option value="E96">E96 (1%)</option>
+                        <option value="CUSTOM">Custom</option>
+                    </select>
+                </div>
+                <button id="autofillButton" class="w-full sm:w-auto px-4 py-2 bg-gray-500 text-white text-sm font-semibold rounded-md shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition duration-150 ease-in-out h-[42px]">
+                    Auto-Fill List Below
+                </button>
+            </div>
+            <textarea id="customValuesInput" name="customValuesInput" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., 100, 220, 470, 1000, 2200, 4700, 10000, ..."></textarea>
+            <p class="text-xs text-gray-500 mt-1">Enter values in Ohms, comma-separated. Use Auto-Fill or edit manually (select 'Custom' if editing).</p>
+        </div>
+
+
+        <div id="errorMessage" class="text-red-600 text-center mb-4 hidden"></div>
+
+        <div id="loadingIndicator" class="hidden text-center my-4">
+            <div class="loader inline-block"></div>
+            <p id="loadingMessage" class="text-gray-600">Calculating combinations...</p>
+        </div>
+
+        <div id="results" class="mt-8 hidden">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Closest Combinations:</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-md">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Combination</th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Calculated Value</th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Difference</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody" class="bg-white divide-y divide-gray-200">
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-sm text-gray-500 mt-4">Showing top 20 results.</p>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        const E_SERIES = {
+            E6: [10, 15, 22, 33, 47, 68],
+            E12: [10, 12, 15, 18, 22, 27, 33, 39, 47, 56, 68, 82],
+            E24: [10, 11, 12, 13, 15, 16, 18, 20, 22, 24, 27, 30, 33, 36, 39, 43, 47, 51, 56, 62, 68, 75, 82, 91],
+            E96: [ // Prefixes * 100 for precision
+                100, 102, 105, 107, 110, 113, 115, 118, 121, 124, 127, 130, 133, 137, 140, 143, 147, 150, 154, 158,
+                162, 165, 169, 174, 178, 182, 187, 191, 196, 200, 205, 210, 215, 221, 226, 232, 237, 243, 249, 255,
+                261, 267, 274, 280, 287, 294, 301, 309, 316, 324, 332, 340, 348, 357, 365, 374, 383, 392, 402, 412,
+                422, 432, 442, 453, 464, 475, 487, 499, 511, 523, 536, 549, 562, 576, 590, 604, 619, 634, 649, 665,
+                681, 698, 715, 732, 750, 768, 787, 806, 825, 845, 866, 887, 909, 931, 953, 976
+            ]
+        };
+        const DECADE_MULTIPLIERS = [1, 10, 100, 1e3, 10e3, 100e3, 1e6, 10e6];
+        const MAX_RESULTS = 20;
+        const TOLERANCE = 1e-9;
+        const FILTER_FACTOR = 1000;
+        const MIN_FILTERED_COUNT = 10;
+
+        // --- DOM Elements ---
+        const targetValueInput = document.getElementById('targetValue');
+        const targetUnitSelect = document.getElementById('targetUnit');
+        const maxResistorsSelect = document.getElementById('maxResistors');
+        const seriesSelect = document.getElementById('seriesSelect');
+        const autofillButton = document.getElementById('autofillButton');
+        const customValuesInput = document.getElementById('customValuesInput');
+        const generateButton = document.getElementById('generateButton');
+        const resultsDiv = document.getElementById('results');
+        const resultsTableBody = document.getElementById('resultsTableBody');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const errorMessageDiv = document.getElementById('errorMessage');
+
+        // --- Global Variables ---
+        let availableValues = [];
+
+        // --- Helper Functions ---
+
+        function formatResistance(value) {
+             if (!isFinite(value)) return "N/A";
+             if (Math.abs(value) < TOLERANCE) return "0 Ω";
+            if (Math.abs(value) >= 1e6) return (value / 1e6).toPrecision(3) + ' MΩ';
+            if (Math.abs(value) >= 1e3) return (value / 1e3).toPrecision(3) + ' kΩ';
+            return value.toPrecision(3) + ' Ω';
+        }
+
+        function getSeriesValues(seriesName) {
+            const prefixes = E_SERIES[seriesName];
+            if (!prefixes) return [];
+            const values = new Set();
+            const prefixMultiplier = seriesName === 'E96' ? 0.01 : 0.1;
+            DECADE_MULTIPLIERS.forEach(decadeMultiplier => {
+                prefixes.forEach(prefix => {
+                    const value = Math.round((prefix * prefixMultiplier * decadeMultiplier) * 1e6) / 1e6;
+                     if (value > 0) { values.add(value); }
+                });
+            });
+            return Array.from(values).sort((a, b) => a - b);
+        }
+
+        function valuesToString(values) {
+             return values.map(v => {
+                 if (v >= 1 && Number.isInteger(v)) return v.toString();
+                 if (v >= 1) return parseFloat(v.toPrecision(6)).toString(); // More precision for non-integers
+                 return parseFloat(v.toPrecision(3)).toString(); // Standard precision for < 1
+             }).join(', ');
+        }
+
+        function handleAutofillClick() {
+            const selectedSeries = seriesSelect.value;
+            errorMessageDiv.classList.add('hidden');
+            if (selectedSeries === 'CUSTOM') { return; }
+            const values = getSeriesValues(selectedSeries);
+            if (values.length > 0) {
+                customValuesInput.value = valuesToString(values);
+            } else {
+                errorMessageDiv.textContent = `Error: Could not generate values for ${selectedSeries}.`;
+                errorMessageDiv.classList.remove('hidden');
+            }
+        }
+
+        function parseAvailableValues() {
+            const text = customValuesInput.value.trim();
+            availableValues = [];
+            const seenValues = new Set();
+            let parseError = false;
+            if (text === '') {
+                errorMessageDiv.textContent = 'Available resistor values list cannot be empty.';
+                errorMessageDiv.classList.remove('hidden'); return false;
+            }
+            const parts = text.split(',');
+            parts.forEach(part => {
+                const trimmedPart = part.trim();
+                if (trimmedPart === '') return;
+                const value = parseFloat(trimmedPart);
+                if (isNaN(value) || value <= 0) { // Ensure positive values
+                    errorMessageDiv.textContent = `Invalid value: "${trimmedPart}". Use positive numbers.`;
+                    parseError = true; return;
+                }
+                if (!seenValues.has(value)) {
+                    availableValues.push({ value: value, label: formatResistance(value) });
+                    seenValues.add(value);
+                }
+            });
+            if (parseError) {
+                errorMessageDiv.classList.remove('hidden'); availableValues = []; return false;
+            }
+            if (availableValues.length === 0) {
+                 errorMessageDiv.textContent = 'No valid resistor values found.';
+                 errorMessageDiv.classList.remove('hidden'); return false;
+            }
+            availableValues.sort((a, b) => a.value - b.value);
+            errorMessageDiv.classList.add('hidden'); errorMessageDiv.textContent = '';
+            return true;
+        }
+
+        function calculateSeries(resistors) { return resistors.reduce((sum, r) => sum + r, 0); }
+        function calculateParallel(resistors) {
+            if (resistors.some(r => Math.abs(r) < TOLERANCE)) return Infinity;
+            const sumOfInverses = resistors.reduce((sum, r) => sum + (1 / r), 0);
+            if (Math.abs(sumOfInverses) < TOLERANCE) return Infinity;
+            return 1 / sumOfInverses;
+        }
+
+        /**
+         * Generates combinations of indices with replacement.
+         * @param {number} n - The number of items to choose from (length of the array).
+         * @param {number} k - The number of items to choose (size of the combination).
+         * @returns {Generator<Array<number>>} A generator yielding arrays of indices.
+         */
+        function* combinationsWithReplacement(n, k) {
+            if (k === 0) {
+                yield [];
+                return;
+            }
+            if (n === 0 && k > 0) return; // Cannot choose if no items are available
+
+            const indices = Array(k).fill(0); // Start with the first item for all k positions
+
+            while (true) {
+                yield indices.slice(); // Yield a copy of the current combination
+
+                // Find the rightmost index to increment
+                let i = k - 1;
+                while (i >= 0 && indices[i] === n - 1) {
+                    i--;
+                }
+
+                // If all indices are n-1 (maxed out), we are done
+                if (i < 0) {
+                    break;
+                }
+
+                // Increment this index
+                indices[i]++;
+
+                // Set subsequent indices to the same value as the incremented one
+                // This ensures lexicographical order and covers all combinations with replacement
+                for (let j = i + 1; j < k; j++) {
+                    indices[j] = indices[i];
+                }
+            }
+        }
+
+
+        function addResult(results, value, description, targetOhms) {
+            if (isFinite(value)) { results.push({ value: value, description: description, diff: Math.abs(value - targetOhms) }); }
+        }
+
+        function findCombinations(targetOhms, maxResistors) {
+             if (!availableValues || availableValues.length === 0) { return null; }
+            const results = [];
+            const n_original = availableValues.length;
+            const lowerBound = targetOhms > TOLERANCE ? targetOhms / FILTER_FACTOR : 0;
+            const upperBound = targetOhms * FILTER_FACTOR;
+            let filteredValues = availableValues.filter(r => r.value >= lowerBound && r.value <= upperBound);
+            const minCount = Math.max(MIN_FILTERED_COUNT, maxResistors);
+             if (filteredValues.length < minCount && n_original >= minCount) { filteredValues = availableValues; }
+             else if (filteredValues.length === 0 && n_original > 0) { filteredValues = availableValues; } // If filter empties, use original
+
+            // If after potential revert, filteredValues is still empty, but original wasn't, something is odd or target is extreme.
+            // For combinations, we need at least 1 item in filteredValues if k > 0.
+            const currentValuesForCombinations = filteredValues.length > 0 ? filteredValues : availableValues;
+            const n = currentValuesForCombinations.length;
+
+            console.log(`Using ${n} resistors for combinations (k>1) (original: ${n_original}).`);
+            availableValues.forEach(r => { addResult(results, r.value, r.label, targetOhms); });
+
+            for (let k = 2; k <= maxResistors; k++) {
+                 if (n === 0 && k > 0) continue; // Cannot form combinations if no items to choose from
+                console.log(`Generating combinations with replacement for k=${k} using ${n} values`);
+                // Use combinationsWithReplacement generator
+                const comboGenerator = combinationsWithReplacement(n, k);
+                for (const indices of comboGenerator) {
+                    const resistors = indices.map(i => currentValuesForCombinations[i]);
+                    const vals = resistors.map(r => r.value);
+                    const labs = resistors.map(r => r.label);
+                    addResult(results, calculateSeries(vals), labs.join(' + '), targetOhms);
+                    addResult(results, calculateParallel(vals), labs.join(' // '), targetOhms);
+                    if (k === 3) {
+                        addResult(results, calculateParallel([calculateSeries([vals[0], vals[1]]), vals[2]]), `(${labs[0]} + ${labs[1]}) // ${labs[2]}`, targetOhms);
+                        addResult(results, calculateParallel([calculateSeries([vals[0], vals[2]]), vals[1]]), `(${labs[0]} + ${labs[2]}) // ${labs[1]}`, targetOhms);
+                        addResult(results, calculateParallel([calculateSeries([vals[1], vals[2]]), vals[0]]), `(${labs[1]} + ${labs[2]}) // ${labs[0]}`, targetOhms);
+                        addResult(results, calculateSeries([vals[0], calculateParallel([vals[1], vals[2]])]), `${labs[0]} + (${labs[1]} // ${labs[2]})`, targetOhms);
+                        addResult(results, calculateSeries([vals[1], calculateParallel([vals[0], vals[2]])]), `${labs[1]} + (${labs[0]} // ${labs[2]})`, targetOhms);
+                        addResult(results, calculateSeries([vals[2], calculateParallel([vals[0], vals[1]])]), `${labs[2]} + (${labs[0]} // ${labs[1]})`, targetOhms);
+                    } else if (k === 4) {
+                        addResult(results, calculateParallel([calculateSeries([vals[0], vals[1]]), calculateSeries([vals[2], vals[3]])]), `(${labs[0]} + ${labs[1]}) // (${labs[2]} + ${labs[3]})`, targetOhms);
+                        addResult(results, calculateParallel([calculateSeries([vals[0], vals[2]]), calculateSeries([vals[1], vals[3]])]), `(${labs[0]} + ${labs[2]}) // (${labs[1]} + ${labs[3]})`, targetOhms);
+                        addResult(results, calculateParallel([calculateSeries([vals[0], vals[3]]), calculateSeries([vals[1], vals[2]])]), `(${labs[0]} + ${labs[3]}) // (${labs[1]} + ${labs[2]})`, targetOhms);
+                        addResult(results, calculateParallel([calculateSeries([vals[0], vals[1], vals[2]]), vals[3]]), `(${labs[0]} + ${labs[1]} + ${labs[2]}) // ${labs[3]}`, targetOhms);
+                        addResult(results, calculateParallel([calculateSeries([vals[0], vals[1], vals[3]]), vals[2]]), `(${labs[0]} + ${labs[1]} + ${labs[3]}) // ${labs[2]}`, targetOhms);
+                        addResult(results, calculateParallel([calculateSeries([vals[0], vals[2], vals[3]]), vals[1]]), `(${labs[0]} + ${labs[2]} + ${labs[3]}) // ${labs[1]}`, targetOhms);
+                        addResult(results, calculateParallel([calculateSeries([vals[1], vals[2], vals[3]]), vals[0]]), `(${labs[1]} + ${labs[2]} + ${labs[3]}) // ${labs[0]}`, targetOhms);
+                        addResult(results, calculateSeries([vals[0], calculateParallel([vals[1], vals[2], vals[3]])]), `${labs[0]} + (${labs[1]} // ${labs[2]} // ${labs[3]})`, targetOhms);
+                        addResult(results, calculateSeries([vals[1], calculateParallel([vals[0], vals[2], vals[3]])]), `${labs[1]} + (${labs[0]} // ${labs[2]} // ${labs[3]})`, targetOhms);
+                        addResult(results, calculateSeries([vals[2], calculateParallel([vals[0], vals[1], vals[3]])]), `${labs[2]} + (${labs[0]} // ${labs[1]} // ${labs[3]})`, targetOhms);
+                        addResult(results, calculateSeries([vals[3], calculateParallel([vals[0], vals[1], vals[2]])]), `${labs[3]} + (${labs[0]} // ${labs[1]} // ${labs[2]})`, targetOhms);
+                        addResult(results, calculateSeries([calculateParallel([vals[0], vals[1], vals[2]]), vals[3]]), `(${labs[0]} // ${labs[1]} // ${labs[2]}) + ${labs[3]}`, targetOhms);
+                        addResult(results, calculateSeries([calculateParallel([vals[0], vals[1], vals[3]]), vals[2]]), `(${labs[0]} // ${labs[1]} // ${labs[3]}) + ${labs[2]}`, targetOhms);
+                        addResult(results, calculateSeries([calculateParallel([vals[0], vals[2], vals[3]]), vals[1]]), `(${labs[0]} // ${labs[2]} // ${labs[3]}) + ${labs[1]}`, targetOhms);
+                        addResult(results, calculateSeries([calculateParallel([vals[1], vals[2], vals[3]]), vals[0]]), `(${labs[1]} // ${labs[2]} // ${labs[3]}) + ${labs[0]}`, targetOhms);
+                    }
+                }
+            }
+            const seenDescriptions = new Set(); const seenValuesMap = new Map();
+            results.forEach(res => {
+                const normDesc = res.description.replace(/\s+/g, ''); const valueKey = res.value.toFixed(9);
+                if (seenDescriptions.has(normDesc) && seenValuesMap.has(valueKey) && seenValuesMap.get(valueKey).description.replace(/\s+/g, '') === normDesc) return;
+                const existingResult = seenValuesMap.get(valueKey);
+                if (existingResult) { if (res.diff < existingResult.diff) { seenValuesMap.set(valueKey, res); seenDescriptions.add(normDesc); } }
+                else { seenValuesMap.set(valueKey, res); seenDescriptions.add(normDesc); }
+            });
+            const finalUniqueResults = Array.from(seenValuesMap.values());
+            finalUniqueResults.sort((a, b) => {
+                if (a.diff !== b.diff) return a.diff - b.diff;
+                // Secondary sort by complexity (fewer components first, then simpler description)
+                const aParts = a.description.match(/(\/\/|\+)/g)?.length || 0;
+                const bParts = b.description.match(/(\/\/|\+)/g)?.length || 0;
+                if(aParts !== bParts) return aParts - bParts;
+                return a.description.length - b.description.length;
+            });
+            console.log(`Found ${finalUniqueResults.length} unique combinations.`);
+            return finalUniqueResults.slice(0, MAX_RESULTS);
+        }
+
+        function displayResults(sortedResults, targetOhms) {
+            resultsTableBody.innerHTML = '';
+            if (!sortedResults || sortedResults.length === 0) {
+                resultsTableBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 px-4 text-gray-500">No combinations found.</td></tr>';
+                resultsDiv.classList.remove('hidden'); return;
+            }
+            sortedResults.forEach(result => {
+                const diffPercent = Math.abs(targetOhms) < TOLERANCE ? (Math.abs(result.value) < TOLERANCE ? 0 : Infinity) : Math.abs((result.value - targetOhms) / targetOhms * 100);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${result.description}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${formatResistance(result.value)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                        ${formatResistance(result.diff)} (${isFinite(diffPercent) ? diffPercent.toFixed(2) + '%' : 'N/A'})
+                        ${result.value > targetOhms + TOLERANCE ? '<span class="text-red-500 ml-1">▲</span>' : result.value < targetOhms - TOLERANCE ? '<span class="text-green-500 ml-1">▼</span>' : ''}
+                    </td>
+                `;
+                resultsTableBody.appendChild(row);
+            });
+            resultsDiv.classList.remove('hidden');
+        }
+
+        async function handleGenerateClick() {
+            resultsDiv.classList.add('hidden'); errorMessageDiv.classList.add('hidden'); errorMessageDiv.textContent = ''; resultsTableBody.innerHTML = '';
+            const parseSuccess = parseAvailableValues();
+            if (!parseSuccess) { return; }
+            const targetValueStr = targetValueInput.value; const targetMultiplier = parseFloat(targetUnitSelect.value); const maxResistorsVal = parseInt(maxResistorsSelect.value, 10);
+            if (targetValueStr === '' || isNaN(parseFloat(targetValueStr))) { errorMessageDiv.textContent = 'Please enter a valid desired resistance.'; errorMessageDiv.classList.remove('hidden'); return; }
+            const targetValueNum = parseFloat(targetValueStr);
+            if (targetValueNum < 0) { errorMessageDiv.textContent = 'Resistance cannot be negative.'; errorMessageDiv.classList.remove('hidden'); return; }
+            const targetOhmsVal = targetValueNum * targetMultiplier;
+            loadingMessage.textContent = `Calculating combinations (up to ${maxResistorsVal} resistors, repeats allowed)...`; loadingIndicator.classList.remove('hidden'); generateButton.disabled = true; generateButton.classList.add('opacity-50', 'cursor-not-allowed');
+            setTimeout(() => {
+                try {
+                    const startTime = performance.now(); const combinationsResult = findCombinations(targetOhmsVal, maxResistorsVal); const endTime = performance.now();
+                    console.log(`Calculation took ${(endTime - startTime).toFixed(2)} ms`);
+                    displayResults(combinationsResult, targetOhmsVal);
+                } catch (error) { console.error("Calculation error:", error); errorMessageDiv.textContent = 'Calculation error. Check console.'; errorMessageDiv.classList.remove('hidden'); }
+                finally { loadingIndicator.classList.add('hidden'); generateButton.disabled = false; generateButton.classList.remove('opacity-50', 'cursor-not-allowed'); }
+            }, 50);
+        }
+
+        // --- Initialization ---
+        customValuesInput.value = valuesToString(getSeriesValues('E24'));
+        autofillButton.addEventListener('click', handleAutofillClick);
+        generateButton.addEventListener('click', handleGenerateClick);
+        targetValueInput.addEventListener('keypress', function(event) { if (event.key === 'Enter') { event.preventDefault(); generateButton.click(); } });
+        maxResistorsSelect.addEventListener('keypress', function(event) { if (event.key === 'Enter') { event.preventDefault(); generateButton.click(); } });
+        customValuesInput.addEventListener('input', () => { seriesSelect.value = 'CUSTOM'; });
+
+    </script>
+</body>
+</html>
